@@ -1,35 +1,7 @@
 pragma solidity ^0.4.21;
 
 
-library SafeMath {
 
-  function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-    if (a == 0) {
-      return 0;
-    }
-    uint256 c = a * b;
-    assert(c / a == b);
-    return c;
-  }
-
-  function div(uint256 a, uint256 b) internal pure returns (uint256) {
-    // assert(b > 0); // Solidity automatically throws when dividing by 0
-    uint256 c = a / b;
-    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-    return c;
-  }
-
-  function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-    assert(b <= a);
-    return a - b;
-  }
-
-  function add(uint256 a, uint256 b) internal pure returns (uint256) {
-    uint256 c = a + b;
-    assert(c >= a);
-    return c;
-  }
-}
 
 contract linew {
     address [] public members; //評価を行う教育従事者のリスト（サービスのユーザーリスト）
@@ -68,8 +40,8 @@ contract linew {
         return balanceOfNEW[_address];
     }
 
-    //NEWトークンの付与
-    function dropNEW (address _to, uint _amount) private {
+    //NEWトークンの付与 開発中のみ"public"に設定
+    function dropNEW (address _to, uint _amount) public {
         balanceOfNEW[_to] += _amount;
     }
 
@@ -91,6 +63,9 @@ contract linew {
 
     function evaluateArchive (uint _id, uint256 _score) public returns (uint){
         require(_score <= 100 && _score >= 0);
+        //1NEW以上保持していることを確認=>1NEW消費
+        if (balanceOfNEW[msg.sender] >=1){
+            balanceOfNEW[msg.sender] --;
         uint id = scores.push(Score(_id,msg.sender,_score)) - 1;//スコア証明書を登録
         scoreToOwner[id] = msg.sender; //score証明書IDと評価者を紐付ける。
         if (archives[_id].scorecount ==0){
@@ -105,6 +80,7 @@ contract linew {
         }
 
         return id; //scoreID
+        }
     }
 
     function receiveNEW(uint _scoreId)public returns (bool){
@@ -153,4 +129,34 @@ contract linew {
          return scores[_id].score;
     }
 
+}
+
+library SafeMath {
+
+  function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+    if (a == 0) {
+      return 0;
+    }
+    uint256 c = a * b;
+    assert(c / a == b);
+    return c;
+  }
+
+  function div(uint256 a, uint256 b) internal pure returns (uint256) {
+    // assert(b > 0); // Solidity automatically throws when dividing by 0
+    uint256 c = a / b;
+    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
+    return c;
+  }
+
+  function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+    assert(b <= a);
+    return a - b;
+  }
+
+  function add(uint256 a, uint256 b) internal pure returns (uint256) {
+    uint256 c = a + b;
+    assert(c >= a);
+    return c;
+  }
 }
